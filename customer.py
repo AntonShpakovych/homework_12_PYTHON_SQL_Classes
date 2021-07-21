@@ -1,6 +1,7 @@
 import psycopg2
 from setup import *
 from connection import Connection
+from pprint import pprint
 
 
 class RegisteredCustomer(Connection):
@@ -17,7 +18,7 @@ class RegisteredCustomer(Connection):
         if self._connectDb(self.login, self.password, role):
             table = ('customer',)
             fields = ('*',)
-            selector = ''
+            selector = f"""where first_name = '{self.first_name}' and last_name = '{self.last_name}' """
             result = self._getData(table, fields, selector)
             return result
         else:
@@ -42,21 +43,35 @@ class RegisteredCustomer(Connection):
         else:
             return 'Incorrect login or password'
 
-    def get_product_info(self):
+    def get_product_info(self, category, selector=''):
         role = 'customer'
         if self._connectDb(self.login, self.password, role):
-            table = ('product',)
-            fields = ('*',)
-            selector = ''
+            table = ('product p inner join product_category pc ',)
+            fields = ('product_name', 'unit_price',)
+            categoryes = ['product_name', 'unit_price']
+            if category and category in categoryes and selector:
+                where = f"""where {category} = '{selector}'"""
+            else:
+                where = ''
+            selector = f"""on p.category_name  = pc.id {where}"""
             result = self._getData(table, fields, selector)
-            return result
+
+            fieldNames = ["product_name", "unit_price", ]
+            сhangeRes = []
+            for item in result:
+                cort = {}
+                for index, element in enumerate(item):
+                    cort[fieldNames[index]] = element
+                сhangeRes.append(cort)
+            return сhangeRes
+
         else:
             return 'Incorrect login or password'
 
 
 if __name__ == '__main__':
     cust = RegisteredCustomer(
-        'Stas', 'Mosey', 2, 'test_unregister_log', 'Mipqol')
+        'Mavk', 'Kvam', 2, 'mavklog', 'mavkpass')
     # -------------------------------
     # data = [{
     #         'employee_id': 1,
@@ -78,3 +93,4 @@ if __name__ == '__main__':
     # -------------------------------
     # dele = cust.delete_order('2021-04-10')
     # print(dele)
+    pprint(cust.get_product_info('unit_price', '40'))

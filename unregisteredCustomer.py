@@ -38,5 +38,7 @@ if __name__ == '__main__':
         'first_name': "Mavk",
         'last_name': "Kvam"
     }]
-    put = regCust.register(data, data_2)
-    print(put)
+    # put = regCust.register(data, data_2)
+    # print(put)
+    user = UnregisteredCuctomer()
+    print(user.get_product_info())
